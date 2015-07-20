@@ -39,7 +39,7 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
     @Override
     public void run(DockerServiceMainConfiguration configuration, Environment environment) {
 
-        SvnInfo.init(configuration.getSvnUrl(), configuration.getSvnUser(), configuration.getSvnPwd());
+        //SvnInfo.init(configuration.getSvnUrl(), configuration.getSvnUser(), configuration.getSvnPwd());
         RemoteDockerService.setDockerServerUrl(configuration.getDockerServerUrl());
 
         final Template template = configuration.buildTemplate();
