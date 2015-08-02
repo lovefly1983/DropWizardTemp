@@ -74,3 +74,8 @@ logging:
 
   appenders:
     - type: console
+
+# Solr settings.
+solr:
+  host: http://localhost:8983
+  zookeeper: localhost:9983

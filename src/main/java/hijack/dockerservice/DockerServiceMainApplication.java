@@ -2,10 +2,7 @@ package hijack.dockerservice;
 
 import hijack.dockerservice.model.Template;
 import hijack.dockerservice.health.TemplateHealthCheck;
-import hijack.dockerservice.resources.ComponentResource;
-import hijack.dockerservice.resources.HomeResource;
-import hijack.dockerservice.resources.JobResource;
-import hijack.dockerservice.resources.SvnInfoResource;
+import hijack.dockerservice.resources.*;
 import hijack.dockerservice.util.RemoteDockerService;
 import hijack.dockerservice.util.SvnInfo;
 import io.dropwizard.Application;
@@ -56,5 +53,6 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
 
         final HomeResource homeResource = new HomeResource("home");
         environment.jersey().register(homeResource);
+        environment.jersey().register(new SolrResource(configuration));
     }
 }

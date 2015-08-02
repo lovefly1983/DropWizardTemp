@@ -1,5 +1,6 @@
 package hijack.dockerservice;
 
+import hijack.dockerservice.factory.SolrFactory;
 import hijack.dockerservice.model.Template;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
@@ -27,6 +28,7 @@ public class DockerServiceMainConfiguration extends Configuration {
 
     @NotEmpty
     private String dockerServerUrl;
+
 
     public String getDockerServerUrl() {
         return dockerServerUrl;
@@ -101,4 +103,12 @@ public class DockerServiceMainConfiguration extends Configuration {
     public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
         this.database = dataSourceFactory;
     }
+
+    private SolrFactory solr = new SolrFactory();
+
+    @JsonProperty("solr")
+    public SolrFactory getSolrFactory() { return solr;}
+
+    @JsonProperty("solr")
+    public void setSolrFactory(SolrFactory solr) { this.solr = solr;}
 }
