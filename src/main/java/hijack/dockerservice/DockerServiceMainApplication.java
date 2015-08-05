@@ -50,9 +50,8 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
         environment.jersey().register(new JobResource());
         environment.jersey().register(new SvnInfoResource());
         environment.jersey().register(new ComponentResource());
-
-        final HomeResource homeResource = new HomeResource("home");
-        environment.jersey().register(homeResource);
+        environment.jersey().register(new HomeResource("home"));
         environment.jersey().register(new SolrResource(configuration));
+        environment.jersey().register(new UploadFileResource());
     }
 }
