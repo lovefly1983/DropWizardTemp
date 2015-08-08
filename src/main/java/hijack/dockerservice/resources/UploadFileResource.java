@@ -1,18 +1,17 @@
 package hijack.dockerservice.resources;
 
-import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.FormDataParam;
 import hijack.dockerservice.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
 import java.text.ParseException;
 
 /**
@@ -42,8 +41,10 @@ public class UploadFileResource {
                 BodyPartEntity bodyPartEntity = (BodyPartEntity) bp.getEntity();
 
                 String uploadedFileLocation = "../images/" + fileName;
-
+                // Write to the file system
                 FileUtils.writeToFile(bodyPartEntity.getInputStream(), uploadedFileLocation);
+
+                // TODO: write to DB for the user.
                 stringBuffer.append("File uploaded to : ").append(uploadedFileLocation).append(NEWLINE);
                 bp.cleanup();
             }
