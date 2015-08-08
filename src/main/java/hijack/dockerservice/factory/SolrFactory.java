@@ -1,7 +1,7 @@
 package hijack.dockerservice.factory;
 
 /**
- * Created by chunjiewang on 1/8/15.
+ * Created by lovefly1983 on 1/8/15.
  */
 public class SolrFactory {
     public void SolrFactory() {}

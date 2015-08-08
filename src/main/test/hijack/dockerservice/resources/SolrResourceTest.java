@@ -10,14 +10,17 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 /**
- * Created by chunjiewang on 1/8/15.
+ * Created by lovefly1983 on 1/8/15.
  */
 public class SolrResourceTest {
     private static final String ZOOKEEPER_HOST = "localhost:9983";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SolrResourceTest.class);
 
     @Test
     public void testCloudClient() {
@@ -36,18 +39,18 @@ public class SolrResourceTest {
             QueryResponse response = solrServer.query(query);
             SolrDocumentList docs = response.getResults();
 
-            System.out.println("document num：" + docs.getNumFound());
-            System.out.println("query time：" + response.getQTime());
+            LOGGER.info("document num：" + docs.getNumFound());
+            LOGGER.info("query time：" + response.getQTime());
 
             for (SolrDocument doc : docs) {
                 String id = (String) doc.getFieldValue("id");
-                System.out.println("id: " + id);
-                System.out.println();
+                LOGGER.info("id: " + id);
+                LOGGER.info("\n");
             }
         } catch (SolrServerException e) {
             e.printStackTrace();
         } catch(Exception e) {
-            System.out.println("Unknowned Exception!!!!");
+            LOGGER.info("Unknowned Exception!!!!");
             e.printStackTrace();
         }
     }
@@ -108,9 +111,9 @@ public class SolrResourceTest {
 
 
         QueryResponse response = solrClient.query(sQuery);
-        System.out.println(response.getResults().getNumFound());
+        LOGGER.info("{}", response.getResults().getNumFound());
         for (SolrDocument document : response.getResults()) {
-            System.out.println(document.getFieldNames());
+            LOGGER.info("{}", document.getFieldNames());
         }
 
     }

@@ -3,7 +3,7 @@ package hijack.dockerservice.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Created by chunjiewang on 2/8/15.
+ * Created by lovefly1983 on 2/8/15.
  */
 public class SolrDocumentRequest {
     @JsonProperty
