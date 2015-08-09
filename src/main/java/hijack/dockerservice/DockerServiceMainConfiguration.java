@@ -29,6 +29,27 @@ public class DockerServiceMainConfiguration extends Configuration {
     @NotEmpty
     private String dockerServerUrl;
 
+    @NotEmpty
+    private String imagesFolder;
+
+    @NotEmpty
+    private String imagesVirtualFolder;
+
+    public String getImagesVirtualFolder() {
+        return imagesVirtualFolder;
+    }
+
+    public void setImagesVirtualFolder(String imagesVirtualFolder) {
+        this.imagesVirtualFolder = imagesVirtualFolder;
+    }
+
+    public String getImagesFolder() {
+        return imagesFolder;
+    }
+
+    public void setImagesFolder(String imagesFolder) {
+        this.imagesFolder = imagesFolder;
+    }
 
     public String getDockerServerUrl() {
         return dockerServerUrl;

@@ -4,6 +4,7 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import hijack.dockerservice.DAO.ImageDAO;
+import hijack.dockerservice.DockerServiceMainConfiguration;
 import hijack.dockerservice.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.text.ParseException;
-import java.util.UUID;
 
 /**
  * Created by lovefly1983 on 5/8/15.
@@ -26,8 +27,10 @@ public class UploadFileResource {
     private static final String FILE_NAME = "filename";
     private static final String NEWLINE = System.getProperty("line.separator");
     private ImageDAO imageDAO;
+    private DockerServiceMainConfiguration configuration;
 
-    public UploadFileResource(ImageDAO dao) {
+    public UploadFileResource(DockerServiceMainConfiguration configuration, ImageDAO dao) {
+        this.configuration = configuration;
         this.imageDAO = dao;
     }
 
@@ -36,7 +39,7 @@ public class UploadFileResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadFile(FormDataMultiPart f) throws ParseException {
 
-        LOGGER.info("upload file ... {}.", System.getProperty("user.dir"));
+        LOGGER.info("upload file ... {}.", configuration.getImagesFolder());
 
         StringBuffer stringBuffer = new StringBuffer();
         try {
@@ -47,14 +50,12 @@ public class UploadFileResource {
                 String fileName = bp.getParameterizedHeaders().getFirst(CONTENT_DISPOSITION).getParameters().get(FILE_NAME);
                 BodyPartEntity bodyPartEntity = (BodyPartEntity) bp.getEntity();
 
-                String uploadedFileLocation = "../images/" + fileName;
                 // Write to the file system
-                FileUtils.writeToFile(bodyPartEntity.getInputStream(), uploadedFileLocation);
+                FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ fileName);
 
-                // TODO: write to DB for the user, use uuid for now...
-                imageDAO.insert(4, uploadedFileLocation);
+                imageDAO.insert(4, configuration.getImagesVirtualFolder());
 
-                stringBuffer.append("File uploaded to : ").append(uploadedFileLocation).append(NEWLINE);
+                stringBuffer.append("File uploaded to : ").append(configuration.getImagesVirtualFolder()).append(NEWLINE);
                 bp.cleanup();
             }
         } finally {

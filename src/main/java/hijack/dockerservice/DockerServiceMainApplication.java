@@ -68,7 +68,7 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
         try {
             jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
             final ImageDAO dao = jdbi.onDemand(ImageDAO.class);
-            environment.jersey().register(new UploadFileResource(dao));
+            environment.jersey().register(new UploadFileResource(configuration, dao));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
