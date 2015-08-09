@@ -41,7 +41,7 @@ public class UploadFileResource {
 
         LOGGER.info("upload file ... {}.", configuration.getImagesFolder());
 
-        StringBuffer stringBuffer = new StringBuffer();
+        boolean succeed = false;
         try {
             for (BodyPart bp : f.getBodyParts()) {
                 System.out.println(bp.getMediaType());
@@ -54,13 +54,18 @@ public class UploadFileResource {
                 FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ fileName);
 
                 imageDAO.insert(4, configuration.getImagesVirtualFolder());
-
-                stringBuffer.append("File uploaded to : ").append(configuration.getImagesVirtualFolder()).append(NEWLINE);
                 bp.cleanup();
+                succeed = true;
             }
         } finally {
             f.cleanup();
         }
-        return Response.status(200).entity(stringBuffer.toString()).build();
+
+        //
+        if (succeed) {
+            return Response.status(200).entity("File upload succeeds...").build();
+        } else {
+            return Response.status(400).entity("File upload fails...").build();
+        }
     }
 }

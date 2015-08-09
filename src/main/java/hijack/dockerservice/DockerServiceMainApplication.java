@@ -56,9 +56,6 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
         environment.healthChecks().register("template", new TemplateHealthCheck(template));
 
         // Resources
-        environment.jersey().register(new JobResource());
-        environment.jersey().register(new SvnInfoResource());
-        environment.jersey().register(new ComponentResource());
         environment.jersey().register(new HomeResource("home"));
         environment.jersey().register(new SolrResource(configuration));
         environment.jersey().register(new RegisterResource());
