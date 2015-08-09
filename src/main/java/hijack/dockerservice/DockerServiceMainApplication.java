@@ -5,7 +5,6 @@ import hijack.dockerservice.model.Template;
 import hijack.dockerservice.health.TemplateHealthCheck;
 import hijack.dockerservice.resources.*;
 import hijack.dockerservice.util.RemoteDockerService;
-import hijack.dockerservice.util.SvnInfo;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.jdbi.DBIFactory;
@@ -65,7 +64,7 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
         try {
             jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
             final ImageDAO dao = jdbi.onDemand(ImageDAO.class);
-            environment.jersey().register(new UploadFileResource(configuration, dao));
+            environment.jersey().register(new FileResource(configuration, dao));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
