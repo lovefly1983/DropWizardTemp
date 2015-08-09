@@ -3,6 +3,7 @@ package hijack.dockerservice.resources;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataMultiPart;
+import hijack.dockerservice.DAO.ImageDAO;
 import hijack.dockerservice.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.text.ParseException;
+import java.util.UUID;
 
 /**
  * Created by lovefly1983 on 5/8/15.
@@ -23,6 +25,11 @@ public class UploadFileResource {
     private static final String CONTENT_DISPOSITION = "Content-Disposition";
     private static final String FILE_NAME = "filename";
     private static final String NEWLINE = System.getProperty("line.separator");
+    private ImageDAO imageDAO;
+
+    public UploadFileResource(ImageDAO dao) {
+        this.imageDAO = dao;
+    }
 
     @POST
     @Path("/upload")
@@ -44,7 +51,9 @@ public class UploadFileResource {
                 // Write to the file system
                 FileUtils.writeToFile(bodyPartEntity.getInputStream(), uploadedFileLocation);
 
-                // TODO: write to DB for the user.
+                // TODO: write to DB for the user, use uuid for now...
+                imageDAO.insert(4, uploadedFileLocation);
+
                 stringBuffer.append("File uploaded to : ").append(uploadedFileLocation).append(NEWLINE);
                 bp.cleanup();
             }
