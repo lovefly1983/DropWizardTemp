@@ -8,9 +8,9 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
  * Created by lovefly1983.
  */
 public interface UserDAO {
-    @SqlUpdate("insert into users (name, email) values (:name, :email)")
-    void insert(@Bind("name") String name, @Bind("email") String email);
+    @SqlUpdate("insert into users (name, email, password) values (:name, :email, :password)")
+    void insert(@Bind("name") String name, @Bind("email") String email, @Bind("password") String password);
 
-    @SqlQuery("select name from images where id = :id")
-    String findNameById(@Bind("id") int id);
+    @SqlQuery("select name from users where email = :email and password = :password")
+    String findUserByEmailAndPassword(@Bind("email") String email, @Bind("password") String password);
 }

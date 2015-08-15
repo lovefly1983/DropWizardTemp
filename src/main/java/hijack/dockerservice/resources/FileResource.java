@@ -42,7 +42,6 @@ public class FileResource {
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public void uploadFile(FormDataMultiPart f) throws ParseException, UnsupportedEncodingException {
-
         LOGGER.info("upload file ... {}.", configuration.getImagesFolder());
 
         try {
@@ -60,6 +59,7 @@ public class FileResource {
                     // Write to the file system
                     FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ fileName);
 
+                    // TODO: get the user id from request
                     imageDAO.insert(4, configuration.getImagesVirtualFolder() + File.separator + fileName);
                     bp.cleanup();
                 }

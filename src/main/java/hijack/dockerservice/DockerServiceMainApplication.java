@@ -1,6 +1,7 @@
 package hijack.dockerservice;
 
 import hijack.dockerservice.DAO.ImageDAO;
+import hijack.dockerservice.DAO.UserDAO;
 import hijack.dockerservice.model.Template;
 import hijack.dockerservice.health.TemplateHealthCheck;
 import hijack.dockerservice.resources.*;
@@ -57,14 +58,15 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
         // Resources
         environment.jersey().register(new HomeResource("home"));
         environment.jersey().register(new SolrResource(configuration));
-        environment.jersey().register(new RegisterResource());
 
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi;
         try {
             jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
-            final ImageDAO dao = jdbi.onDemand(ImageDAO.class);
-            environment.jersey().register(new FileResource(configuration, dao));
+            final ImageDAO imageDAO = jdbi.onDemand(ImageDAO.class);
+            final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
+            environment.jersey().register(new FileResource(configuration, imageDAO));
+            environment.jersey().register(new RegisterResource(userDAO));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
