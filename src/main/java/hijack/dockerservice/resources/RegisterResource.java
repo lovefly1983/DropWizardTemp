@@ -1,16 +1,15 @@
 package hijack.dockerservice.resources;
 
 import hijack.dockerservice.DAO.UserDAO;
-import hijack.dockerservice.model.RegisterAndLoginRequest;
-import org.apache.commons.lang.StringUtils;
+import hijack.dockerservice.DAO.model.User;
+import hijack.dockerservice.model.RegisterAndLoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
@@ -26,31 +25,32 @@ public class RegisterResource {
     public RegisterResource(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
+
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/register")
-    public Response register(@Valid RegisterAndLoginRequest request) {
-        LOGGER.info("Received a submit Job Request: {}", request);
-        LOGGER.info("User name & password: {}, {}", request.getEmail(), request.getPassword());
-        // Save to db
+    public Response register(@FormParam("email") String email, @FormParam("password") String password ) {
+        LOGGER.info("User name & password: {}, {}", email, password);
+        NewCookie cookie = null;
+        CacheControl cc = new CacheControl();
+        cookie = new NewCookie("userId", "55", "/comp/user/login", "testapp", null, 365*24*60*60, false);
+        cc.setNoCache(true);
+        if(cookie.getValue() != null)
+            return Response.ok("welcome "+cookie.getValue()).cookie(cookie).cacheControl(cc).build();
         return Response.status(200).entity("Register succeed!!!").build();
     }
 
     @POST
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/login")
-    public Response login(@FormParam("email") String email, @FormParam("password") String password) {
+    public RegisterAndLoginResponse login(@FormParam("email") String email, @FormParam("password") String password) {
         LOGGER.info("User name & password: {}, {}", email, password);
         // TODO: use dropwizard auth service... and cookie settings...
-        String name = userDAO.findUserByEmailAndPassword(email, password);
-        if (StringUtils.isNotEmpty(name)) {
-            NewCookie cookie = null;
-            CacheControl cc = new CacheControl();
-            cookie = new NewCookie("userName", name);
-            cc.setNoCache(true);
-            if(cookie.getValue() != null)
-                return Response.ok("welcome "+cookie.getValue()).cookie(cookie).cacheControl(cc).build();
-            return Response.status(200).entity("login succeed!!!").build();
+        User user = userDAO.findUserByEmailAndPassword(email, password);
+        RegisterAndLoginResponse registerAndLoginResponse = null;
+        if (user != null) {
+            registerAndLoginResponse = new RegisterAndLoginResponse("login succeed", user.getId());
+            return registerAndLoginResponse;
         }
-        return Response.status(400).entity("login fail!!!").build();
+        return new RegisterAndLoginResponse("login fails", -1);
     }
 }

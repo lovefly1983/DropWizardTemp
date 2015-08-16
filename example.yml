@@ -27,7 +27,7 @@ database:
     password: wcj2046test
 
     # the JDBC URL
-    url: jdbc:mysql://localhost:3306/try
+    url: jdbc:mysql://testapp:3306/try
 
     # any properties specific to your JDBC driver:
     properties:
@@ -112,5 +112,5 @@ logging:
 
 # Solr settings.
 solr:
-  host: http://localhost:8983
-  zookeeper: localhost:9983
+  host: http://testapp:8983
+  zookeeper: testapp:9983

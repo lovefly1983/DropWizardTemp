@@ -3,22 +3,18 @@ package hijack.dockerservice.resources;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import hijack.dockerservice.DAO.BaseDAO;
 import hijack.dockerservice.DAO.ImageDAO;
 import hijack.dockerservice.DockerServiceMainConfiguration;
 import hijack.dockerservice.model.FileQueryResponse;
 import hijack.dockerservice.util.FileUtils;
-import io.dropwizard.db.DataSourceFactory;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.sql.*;
 import java.text.ParseException;
 
 /**
@@ -41,27 +37,28 @@ public class FileResource {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public void uploadFile(FormDataMultiPart f) throws ParseException, UnsupportedEncodingException {
-        LOGGER.info("upload file ... {}.", configuration.getImagesFolder());
+    public void uploadFile(FormDataMultiPart f, @CookieParam("userId") String userId) throws ParseException, UnsupportedEncodingException {
+        LOGGER.info("upload file ... {}. with user id {}", configuration.getImagesFolder(), userId);
 
         try {
-            for (BodyPart bp : f.getBodyParts()) {
-                String str = bp.getParameterizedHeaders().getFirst(CONTENT_DISPOSITION).getParameters().get(FILE_NAME);
+            if (isUserLogined(userId)) {
+                for (BodyPart bp : f.getBodyParts()) {
+                    String str = bp.getParameterizedHeaders().getFirst(CONTENT_DISPOSITION).getParameters().get(FILE_NAME);
 
-                // Make sure we can get the file name correctly
-                String fileName = new String(str.getBytes("iso8859-1"), "utf-8");
+                    // Make sure we can get the file name correctly
+                    String fileName = new String(str.getBytes("iso8859-1"), "utf-8");
 
-                LOGGER.info("file name {}", fileName);
+                    LOGGER.info("file name {}", fileName);
 
-                BodyPartEntity bodyPartEntity = (BodyPartEntity) bp.getEntity();
+                    BodyPartEntity bodyPartEntity = (BodyPartEntity) bp.getEntity();
 
-                if (StringUtils.isNotEmpty(fileName)) {
-                    // Write to the file system
-                    FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ fileName);
+                    if (StringUtils.isNotEmpty(fileName)) {
+                        // Write to the file system
+                        FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ fileName);
 
-                    // TODO: get the user id from request
-                    imageDAO.insert(4, configuration.getImagesVirtualFolder() + File.separator + fileName);
-                    bp.cleanup();
+                        imageDAO.insert(Integer.valueOf(userId), configuration.getImagesVirtualFolder() + File.separator + fileName);
+                        bp.cleanup();
+                    }
                 }
             }
         } finally {
@@ -75,5 +72,9 @@ public class FileResource {
         FileQueryResponse response = new FileQueryResponse();
         response.setImageList(imageDAO.listImages());
         return response;
+    }
+
+    private boolean isUserLogined(String userId) {
+        return userId != null && !"-1".equals(userId);
     }
 }
