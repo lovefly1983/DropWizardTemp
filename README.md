@@ -16,7 +16,7 @@ TODO:
 * Use Swagger to define the RESTful APIs.
 * Generate the image preview on the fly when uploading (or use a cron job, MQ to async process it)
 * Make sure images store into sub-folders by timestamp.
-* Add memchaned support
+* Add memcached or Redis support
 * Register functionality
 * ~~Login functionality~~
 * Integrate with 3rd API like QQ, Wechat, Weibo

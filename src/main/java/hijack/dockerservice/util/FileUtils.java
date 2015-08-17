@@ -14,7 +14,12 @@ public class FileUtils {
             int read = 0;
             byte[] bytes = new byte[1024];
 
-            OutputStream out = new FileOutputStream(new File(uploadedFileLocation));
+            File f = new File(uploadedFileLocation);
+            if(!f.getParentFile().exists()){
+                f.getParentFile().mkdirs();
+            }
+
+            OutputStream out = new FileOutputStream(f);
             while ((read = uploadedInputStream.read(bytes)) != -1) {
                 out.write(bytes, 0, read);
             }

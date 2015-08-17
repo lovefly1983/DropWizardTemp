@@ -16,6 +16,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by lovefly1983 on 5/8/15.
@@ -38,7 +40,7 @@ public class FileResource {
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public void uploadFile(FormDataMultiPart f, @CookieParam("userId") String userId) throws ParseException, UnsupportedEncodingException {
-        LOGGER.info("upload file ... {}. with user id {}", configuration.getImagesFolder(), userId);
+        LOGGER.info("upload file ... {} with user id {}", configuration.getImagesFolder(), userId);
 
         try {
             if (isUserLogined(userId)) {
@@ -54,9 +56,10 @@ public class FileResource {
 
                     if (StringUtils.isNotEmpty(fileName)) {
                         // Write to the file system
-                        FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ fileName);
+                        String filePath = getFilePath(userId, fileName);
+                        FileUtils.writeToFile(bodyPartEntity.getInputStream(), configuration.getImagesFolder() + File.separator+ filePath);
 
-                        imageDAO.insert(Integer.valueOf(userId), configuration.getImagesVirtualFolder() + File.separator + fileName);
+                        imageDAO.insert(Integer.valueOf(userId), configuration.getImagesVirtualFolder() + File.separator + filePath);
                         bp.cleanup();
                     }
                 }
@@ -76,5 +79,18 @@ public class FileResource {
 
     private boolean isUserLogined(String userId) {
         return userId != null && !"-1".equals(userId);
+    }
+
+    private String getFilePath(String userId, String fileName) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(userId).append(File.separator).append(getFormatNowDate()).append(File.separator).append(fileName);
+        return sb.toString();
+    }
+
+    public String getFormatNowDate() {
+        Date nowTime = new Date(System.currentTimeMillis());
+        SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd");
+        String retStrFormatNowDate = sdFormatter.format(nowTime);
+        return retStrFormatNowDate;
     }
 }
