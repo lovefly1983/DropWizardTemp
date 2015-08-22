@@ -15,7 +15,7 @@ public class ImageDAOTest {
 
         ImageDAO dao = dbi.open(ImageDAO.class);
 
-        dao.insert(4, "cwang@gmail.com");
+        dao.insert(4, "cwang@gmail.com", "");
         dao.close();
     }
 }
