@@ -50,8 +50,8 @@ public class FileResource {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public void uploadFile(FormDataMultiPart f, @CookieParam("userId") String userId) throws ParseException, UnsupportedEncodingException {
-        LOGGER.debug("upload file ... {} with user id {}", configuration.getImagesFolder(), userId);
+    public void uploadFile(FormDataMultiPart f, @CookieParam("userId") String userId) {
+        LOGGER.info("upload file ... {} with user id {}", configuration.getImagesFolder(), userId);
 
         try {
             if (isUserLogined(userId)) {
@@ -74,14 +74,15 @@ public class FileResource {
 
                         // Save preview image
                         String previewPath = getFilePath(userId, "preview", fileName);
+                        /*
                         // TODO: generate the preview at client side since the rendering might cause many cpu cycles...
                         FileUtils.writePreviewImage(inputStream, 300, 300, configuration.getImagesFolder() + File.separator + previewPath);
-
+                        */
                         // Save path into db.
                         String prefix = configuration.getImagesVirtualFolder();
                         String fullPath = prefix + File.separator + filePath;
                         String previewFullPath = prefix + File.separator + previewPath;
-                        getImageDAO().insert(Integer.valueOf(userId), fullPath, previewFullPath);
+                        getImageDAO().insert(Integer.valueOf(userId), fullPath, fullPath);
 
                         // Cleanup
                         bp.cleanup();
@@ -89,6 +90,8 @@ public class FileResource {
                 }
             }
         } catch (IOException e) {
+            LOGGER.error(Throwables.getStackTraceAsString(e));
+        } catch (ParseException e) {
             LOGGER.error(Throwables.getStackTraceAsString(e));
         } finally {
             f.cleanup();
