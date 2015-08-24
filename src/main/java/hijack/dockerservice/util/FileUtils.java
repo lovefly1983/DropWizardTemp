@@ -46,26 +46,15 @@ public class FileUtils {
 
     /**
      * Write the preview image
-     * @param inputStream
+     * @param
      * @param width
      * @param height
      * @param uploadedFileLocation
      */
-    public static void writePreviewImage(InputStream inputStream, int width, int height, String uploadedFileLocation) {
+    public static void writePreviewImage(String filename, int width, int height, String uploadedFileLocation) {
         try {
-            /*
-            BufferedImage resizedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = resizedImage.createGraphics();
-            g.setComposite(AlphaComposite.Src);
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            g.drawImage(ImageIO.read(inputStream).getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
-            g.dispose();
-            */
-
-            BufferedImage bufferedImage = ImageIO.read(inputStream);
+            // ImageIo.read(InputStream) returns null, workaround is to use the File right now.
+            BufferedImage bufferedImage = ImageIO.read(new File(filename));
             BufferedImage resizedImage = scale(bufferedImage, 0.3);
 
             File f = new File(uploadedFileLocation);
