@@ -66,22 +66,23 @@ public class FileResource {
                     BodyPartEntity bodyPartEntity = (BodyPartEntity) bp.getEntity();
 
                     if (StringUtils.isNotEmpty(fileName)) {
+                        InputStream inputStream = bodyPartEntity.getInputStream();
+
                         // Save raw image
                         String filePath = getFilePath(userId, null, fileName);
-
-                        InputStream inputStream = bodyPartEntity.getInputStream();
+                        String fileFullPath = configuration.getImagesFolder() + File.separator+ filePath;
                         FileUtils.writeToFile(inputStream, configuration.getImagesFolder() + File.separator+ filePath);
 
                         // Save preview image
                         String previewPath = getFilePath(userId, "preview", fileName);
-                        /*
-                        // TODO: generate the preview at client side since the rendering might cause many cpu cycles...
-                        FileUtils.writePreviewImage(inputStream, 300, 300, configuration.getImagesFolder() + File.separator + previewPath);
-                        */
+
+                        // Disable writing preview right now.
+                        //FileUtils.writePreviewImage(fileFullPath, 300, 300, configuration.getImagesFolder() + File.separator + previewPath);
                         // Save path into db.
                         String prefix = configuration.getImagesVirtualFolder();
                         String fullPath = prefix + File.separator + filePath;
                         String previewFullPath = prefix + File.separator + previewPath;
+
                         getImageDAO().insert(Integer.valueOf(userId), fullPath, fullPath);
 
                         // Cleanup
