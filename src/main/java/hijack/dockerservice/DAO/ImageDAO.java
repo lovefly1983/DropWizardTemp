@@ -15,4 +15,7 @@ public interface ImageDAO extends BaseDAO {
 
     @SqlQuery("select preview from images")
     List<String> listImages();
+
+    @SqlQuery("select preview from images where user_id = :userId")
+    List<String> listImagesByUser(@Bind("userId") int userId);
 }

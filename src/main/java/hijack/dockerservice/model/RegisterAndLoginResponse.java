@@ -12,9 +12,21 @@ public class RegisterAndLoginResponse {
     @JsonProperty
     private int userId;
 
-    public RegisterAndLoginResponse(String message, int userId) {
+    @JsonProperty
+    private String userName;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public RegisterAndLoginResponse(String message, int userId, String userName) {
         this.message = message;
         this.userId = userId;
+        this.userName = userName;
     }
 
     public RegisterAndLoginResponse() {

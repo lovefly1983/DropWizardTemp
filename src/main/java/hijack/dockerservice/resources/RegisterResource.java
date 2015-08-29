@@ -27,15 +27,21 @@ public class RegisterResource {
     }
 
     @POST
-    @Path("/register")
-    public Response register(@FormParam("email") String email, @FormParam("password") String password ) {
-        LOGGER.info("User name & password: {}, {}", email, password);
+    @Path("/signup")
+    public Response register(@FormParam("name") String name,
+                             @FormParam("email") String email,
+                             @FormParam("password") String password ) {
+        LOGGER.info("User name, email & password: {} {}, {}", name, email, password);
+        /*
         NewCookie cookie = null;
         CacheControl cc = new CacheControl();
         cookie = new NewCookie("userId", "55", "/comp/user/login", "testapp", null, 365*24*60*60, false);
         cc.setNoCache(true);
         if(cookie.getValue() != null)
             return Response.ok("welcome "+cookie.getValue()).cookie(cookie).cacheControl(cc).build();
+        */
+
+        userDAO.insert(name, email, password);
         return Response.status(200).entity("Register succeed!!!").build();
     }
 
@@ -48,9 +54,9 @@ public class RegisterResource {
         User user = userDAO.findUserByEmailAndPassword(email, password);
         RegisterAndLoginResponse registerAndLoginResponse = null;
         if (user != null) {
-            registerAndLoginResponse = new RegisterAndLoginResponse("login succeed", user.getId());
+            registerAndLoginResponse = new RegisterAndLoginResponse("login succeed", user.getId(), user.getName());
             return registerAndLoginResponse;
         }
-        return new RegisterAndLoginResponse("login fails", -1);
+        return new RegisterAndLoginResponse("login fails", -1, "Fail");
     }
 }

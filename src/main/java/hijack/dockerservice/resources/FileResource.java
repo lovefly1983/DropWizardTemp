@@ -100,15 +100,14 @@ public class FileResource {
     }
 
     /**
-     * The list of files
-     *
-     * @return
+     * Return the list of files by user id.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public FileQueryResponse listFiles() {
+    public FileQueryResponse listFiles(@QueryParam("userId") String userId) {
+        LOGGER.info("user Id : {}", userId);
         FileQueryResponse response = new FileQueryResponse();
-        response.setImageList(getImageDAO().listImages());
+        response.setImageList(getImageDAO().listImagesByUser(Integer.valueOf(userId)));
         return response;
     }
 
