@@ -75,7 +75,7 @@ public class SolrResource {
         sorlClient.add(docs);
         sorlClient.optimize();
         sorlClient.commit();
-        logger.info("file is indexed to solr: {}.", map.entrySet().iterator().next().getKey());
+        logger.info("file is indexed to solr: {}.", map.entrySet().iterator().next().getValue());
     }
 
     /**
