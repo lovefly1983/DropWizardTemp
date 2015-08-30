@@ -5,35 +5,45 @@ import hijack.dockerservice.model.Template;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class DockerServiceMainConfiguration extends Configuration {
-    @NotEmpty
+    @NotNull
     private String template;
 
-    @NotEmpty
+    @NotNull
     private String defaultName = "Stranger";
 
-    @NotEmpty
+    @NotNull
     private String svnUser;
 
-    @NotEmpty
+    @NotNull
     private String svnPwd;
 
-    @NotEmpty
+    @NotNull
     private String svnUrl;
 
-    @NotEmpty
+    @NotNull
     private String dockerServerUrl;
 
-    @NotEmpty
+    @NotNull
     private String imagesFolder;
 
-    @NotEmpty
+    @NotNull
     private String imagesVirtualFolder;
+
+    @NotNull
+    private boolean asyncToSolr;
+
+    public boolean isAsyncToSolr() {
+        return asyncToSolr;
+    }
+
+    public void setAsyncToSolr(boolean asyncToSolr) {
+        this.asyncToSolr = asyncToSolr;
+    }
 
     public String getImagesVirtualFolder() {
         return imagesVirtualFolder;

@@ -21,14 +21,15 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @Path("/comp/solr")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SolrResource {
-    final Logger logger = LoggerFactory.getLogger(SolrResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(SolrResource.class);
 
-    private SolrClient sorlClient;
+    private static SolrClient sorlClient;
 
     public SolrResource() {
         this(null);
@@ -61,6 +62,20 @@ public class SolrResource {
         sorlClient.add(docs);
         sorlClient.optimize();
         sorlClient.commit();
+    }
+
+    public static void addFileIntoSolr(Map<String, String> map) throws IOException, SolrServerException {
+        Collection<SolrInputDocument> docs = new ArrayList<>();
+        SolrInputDocument doc = new SolrInputDocument();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            doc.addField(entry.getKey(), entry.getValue());
+        }
+
+        docs.add(doc);
+        sorlClient.add(docs);
+        sorlClient.optimize();
+        sorlClient.commit();
+        logger.info("file is indexed to solr: {}.", map.entrySet().iterator().next().getKey());
     }
 
     /**

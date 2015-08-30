@@ -10,11 +10,13 @@ Steps to run:
 * java -jar target/docker-service-1.0-SNAPSHOT.jar server example.yml
 
 TODO:
-* Use Swagger to define the RESTful APIs.
 * ~~Generate the image preview on the fly when uploading (or use a cron job, MQ to async process it)~~
 * ~~Make sure images store into sub-folders by timestamp.~~
-* Add memcached or Redis support
-* Register functionality
+* ~~Register functionality~~
 * ~~Login functionality~~
+* Use Swagger to define the RESTful APIs.
 * Integrate with 3rd API like QQ, Wechat, Weibo
+* NRT solr update & scheduled DIH
+* MQ (kafka or rabbit etc.) to decouple components
+* Add memcached or Redis support
 * More to add...

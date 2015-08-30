@@ -9,6 +9,7 @@ import hijack.dockerservice.DockerServiceMainConfiguration;
 import hijack.dockerservice.model.FileQueryResponse;
 import hijack.dockerservice.util.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by lovefly1983 on 5/8/15.
@@ -59,7 +61,7 @@ public class FileResource {
                     String str = bp.getParameterizedHeaders().getFirst(CONTENT_DISPOSITION).getParameters().get(FILE_NAME);
 
                     // Make sure we can get the file name correctly
-                    String fileName = new String(str.getBytes("iso8859-1"), "utf-8");
+                    final String fileName = new String(str.getBytes("iso8859-1"), "utf-8");
 
                     LOGGER.debug("file name {}", fileName);
 
@@ -68,9 +70,9 @@ public class FileResource {
                     if (StringUtils.isNotEmpty(fileName)) {
                         InputStream inputStream = bodyPartEntity.getInputStream();
 
-                        // Save raw image
+                        // Save raw image into disk
                         String filePath = getFilePath(userId, null, fileName);
-                        String fileFullPath = configuration.getImagesFolder() + File.separator+ filePath;
+                        final String fileFullPath = configuration.getImagesFolder() + File.separator+ filePath;
                         FileUtils.writeToFile(inputStream, configuration.getImagesFolder() + File.separator+ filePath);
 
                         // Save preview image
@@ -80,10 +82,22 @@ public class FileResource {
                         //FileUtils.writePreviewImage(fileFullPath, 300, 300, configuration.getImagesFolder() + File.separator + previewPath);
                         // Save path into db.
                         String prefix = configuration.getImagesVirtualFolder();
-                        String fullPath = prefix + File.separator + filePath;
+                        final String fullPath = prefix + File.separator + filePath;
                         String previewFullPath = prefix + File.separator + previewPath;
 
+                        // Save path into db
                         getImageDAO().insert(Integer.valueOf(userId), fullPath, fullPath);
+
+                        // Save into solr index
+                        LOGGER.info("Save the file into solr index");
+                        if (!configuration.isAsyncToSolr()) {
+                            SolrResource.addFileIntoSolr(new HashMap<String, String>() {{
+                                put("id", fullPath);
+                                put("title", fileName);
+                            }});
+                        } else {
+                            // TODO: async
+                        }
 
                         // Cleanup
                         bp.cleanup();
@@ -94,6 +108,8 @@ public class FileResource {
             LOGGER.error(Throwables.getStackTraceAsString(e));
         } catch (ParseException e) {
             LOGGER.error(Throwables.getStackTraceAsString(e));
+        } catch (SolrServerException e) {
+            e.printStackTrace();
         } finally {
             f.cleanup();
         }
