@@ -70,12 +70,12 @@ public class FileResource {
                     if (StringUtils.isNotEmpty(fileName)) {
                         InputStream inputStream = bodyPartEntity.getInputStream();
 
-                        // Save raw image into disk
+                        //1. Save raw image into disk
                         String filePath = getFilePath(userId, null, fileName);
                         final String fileFullPath = configuration.getImagesFolder() + File.separator+ filePath;
                         FileUtils.writeToFile(inputStream, configuration.getImagesFolder() + File.separator+ filePath);
 
-                        // Save preview image
+                        //2. Save preview image
                         String previewPath = getFilePath(userId, "preview", fileName);
 
                         // Disable writing preview right now.
@@ -85,10 +85,10 @@ public class FileResource {
                         final String fullPath = prefix + File.separator + filePath;
                         String previewFullPath = prefix + File.separator + previewPath;
 
-                        // Save path into db
+                        //3. Save path into db
                         getImageDAO().insert(Integer.valueOf(userId), fullPath, fullPath);
 
-                        // Save into solr index
+                        //4. Save into solr index
                         LOGGER.info("Save the file into solr index");
                         if (!configuration.isAsyncToSolr()) {
                             SolrResource.addFileIntoSolr(new HashMap<String, String>() {{
@@ -96,10 +96,12 @@ public class FileResource {
                                 put("title", fileName);
                             }});
                         } else {
-                            // TODO: async
+                            // TODO: async, the above logic will slow down the process.
+                            // Either to have another thread to listen on a blocking queue
+                            // or use redis/kafka ...
                         }
 
-                        // Cleanup
+                        //5. Cleanup
                         bp.cleanup();
                     }
                 }

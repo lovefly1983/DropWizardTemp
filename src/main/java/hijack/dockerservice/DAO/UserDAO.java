@@ -17,4 +17,8 @@ public interface UserDAO {
     @SqlQuery("select id, name, email from users where email = :email and password = :password")
     @Mapper(UserMapper.class)
     User findUserByEmailAndPassword(@Bind("email") String email, @Bind("password") String password);
+
+    @SqlQuery("select id, name, email from users where email = :email")
+    @Mapper(UserMapper.class)
+    User findUserByEmail(@Bind("email") String email);
 }

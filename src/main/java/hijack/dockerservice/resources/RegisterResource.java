@@ -41,6 +41,11 @@ public class RegisterResource {
             return Response.ok("welcome "+cookie.getValue()).cookie(cookie).cacheControl(cc).build();
         */
 
+        User user = userDAO.findUserByEmail(email);
+        if (user != null) {
+            return Response.status(400).entity("Already registered!!!").build();
+        }
+        // New user into DB
         userDAO.insert(name, email, password);
         return Response.status(200).entity("Register succeed!!!").build();
     }
