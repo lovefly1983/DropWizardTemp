@@ -19,4 +19,6 @@ TODO:
 * NRT solr update & scheduled DIH
 * MQ (kafka or rabbit etc.) to decouple components
 * Add memcached or Redis support
+* Review
+* Follower
 * More to add...

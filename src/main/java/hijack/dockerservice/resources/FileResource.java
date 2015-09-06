@@ -1,5 +1,7 @@
 package hijack.dockerservice.resources;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -12,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -23,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lovefly1983 on 5/8/15.
@@ -35,6 +39,9 @@ public class FileResource {
     private static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
     private ImageDAO imageDAO;
     private DockerServiceMainConfiguration configuration;
+
+    public FileResource() {
+    }
 
     public FileResource(DockerServiceMainConfiguration configuration, ImageDAO dao) {
         this.configuration = configuration;
@@ -52,7 +59,7 @@ public class FileResource {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public void uploadFile(FormDataMultiPart f, @CookieParam("userId") String userId) {
+    public void uploadFile(FormDataMultiPart f, @CookieParam("userId") final String userId) {
         LOGGER.info("upload file ... {} with user id {}", configuration.getImagesFolder(), userId);
 
         try {
@@ -90,15 +97,16 @@ public class FileResource {
 
                         //4. Save into solr index
                         LOGGER.info("Save the file into solr index");
+                        Map paramsForIndex = new HashMap<String, String>() {{
+                            put("userId", userId);
+                            put("id", fullPath);
+                            put("title", fileName);
+                        }};
                         if (!configuration.isAsyncToSolr()) {
-                            SolrResource.addFileIntoSolr(new HashMap<String, String>() {{
-                                put("id", fullPath);
-                                put("title", fileName);
-                            }});
+                            SolrResource.addFileIntoSolr(paramsForIndex);
                         } else {
-                            // TODO: async, the above logic will slow down the process.
-                            // Either to have another thread to listen on a blocking queue
-                            // or use redis/kafka ...
+                            Jedis jedis = new Jedis("localhost");
+                            jedis.rpush("solrQueue", mapToJson(paramsForIndex));
                         }
 
                         //5. Cleanup
@@ -165,5 +173,37 @@ public class FileResource {
         SimpleDateFormat sdFormatter = new SimpleDateFormat(SIMPLE_DATE_FORMAT);
         String retStrFormatNowDate = sdFormatter.format(nowTime);
         return retStrFormatNowDate;
+    }
+
+    private String mapToJson(Map<String, String> map) {
+        String json = "";
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            //convert map to JSON string
+            json = mapper.writeValueAsString(map);
+
+            return json;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Map<String, String> jsonToMap(String json) {
+        Map<String,String> map = new HashMap<String,String>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+
+            //convert JSON string to Map
+            map = mapper.readValue(json, new TypeReference<HashMap<String,String>>(){});
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 }

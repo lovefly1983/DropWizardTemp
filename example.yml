@@ -14,7 +14,7 @@ svnPwd: b
 
 defaultName: Stranger
 
-asyncToSolr: false
+asyncToSolr: true
 
 # Database settings.
 database:
