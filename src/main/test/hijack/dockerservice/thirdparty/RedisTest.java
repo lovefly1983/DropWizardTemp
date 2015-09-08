@@ -11,7 +11,6 @@ import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,9 +65,6 @@ public class RedisTest {
                 System.out.println("KEY:" + entry.getKey() + " VALUE:" + entry.getValue());
             }
             try {
-                // TODO el otro metodo podria hacer q no se consuman mensajes por un
-                // tiempo si no llegan, de esta manera solo se esperan 500ms y se
-                // controla que haya mensajes.
                 Thread.sleep(500);
             } catch (InterruptedException e) {
             }

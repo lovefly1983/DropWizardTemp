@@ -9,6 +9,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,13 @@ import java.io.IOException;
 /**
  * Created by lovefly1983 on 1/8/15.
  */
+@Ignore
 public class SolrResourceTest {
     private static final String ZOOKEEPER_HOST = "localhost:9983";
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrResourceTest.class);
 
     @Test
+    @Ignore
     public void testCloudClient() {
         CloudSolrClient cloudSolrServer = new CloudSolrClient(ZOOKEEPER_HOST);
         cloudSolrServer.setDefaultCollection("gettingstarted");
@@ -56,6 +59,7 @@ public class SolrResourceTest {
     }
 
     @Test
+    @Ignore
     public void testHttpSolrClient() throws SolrServerException, IOException {
         final HttpSolrClient httpSolrClient  = SolrResource.SolrClientFactory.getInstance().getSolrClient(null);
         search(httpSolrClient, "", "", "", "", 0, 44);

@@ -39,6 +39,7 @@ public class FileResource {
     private static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
     private ImageDAO imageDAO;
     private DockerServiceMainConfiguration configuration;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public FileResource() {
     }
@@ -178,13 +179,9 @@ public class FileResource {
     private String mapToJson(Map<String, String> map) {
         String json = "";
         try {
-            ObjectMapper mapper = new ObjectMapper();
-
             //convert map to JSON string
             json = mapper.writeValueAsString(map);
-
             return json;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -193,14 +190,9 @@ public class FileResource {
 
     public Map<String, String> jsonToMap(String json) {
         Map<String,String> map = new HashMap<String,String>();
-        ObjectMapper mapper = new ObjectMapper();
-
         try {
-
             //convert JSON string to Map
             map = mapper.readValue(json, new TypeReference<HashMap<String,String>>(){});
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
