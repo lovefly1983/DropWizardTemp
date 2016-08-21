@@ -1,17 +1,24 @@
 package hijack.dockerservice;
 
+import hijack.dockerservice.DAO.ImageDAO;
+import hijack.dockerservice.DAO.UserDAO;
 import hijack.dockerservice.model.Template;
 import hijack.dockerservice.health.TemplateHealthCheck;
-import hijack.dockerservice.resources.ComponentResource;
-import hijack.dockerservice.resources.JobResource;
-import hijack.dockerservice.resources.SvnInfoResource;
+import hijack.dockerservice.resources.*;
 import hijack.dockerservice.util.RemoteDockerService;
-import hijack.dockerservice.util.SvnInfo;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.views.ViewBundle;
+import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DockerServiceMainApplication extends Application<DockerServiceMainConfiguration> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockerServiceMainApplication.class);
+
     public static void main(String[] args) throws Exception {
         new DockerServiceMainApplication().run(args);
     }
@@ -34,19 +41,34 @@ public class DockerServiceMainApplication extends Application<DockerServiceMainC
         });
         bootstrap.addBundle(new ViewBundle());
         */
+        bootstrap.addBundle(new ViewBundle());
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/assets/"));
     }
 
     @Override
     public void run(DockerServiceMainConfiguration configuration, Environment environment) {
 
-        SvnInfo.init(configuration.getSvnUrl(), configuration.getSvnUser(), configuration.getSvnPwd());
+        LOGGER.info("Run the app...");
+        //SvnInfo.init(configuration.getSvnUrl(), configuration.getSvnUser(), configuration.getSvnPwd());
         RemoteDockerService.setDockerServerUrl(configuration.getDockerServerUrl());
 
         final Template template = configuration.buildTemplate();
         environment.healthChecks().register("template", new TemplateHealthCheck(template));
 
-        environment.jersey().register(new JobResource());
-        environment.jersey().register(new SvnInfoResource());
-        environment.jersey().register(new ComponentResource());
+        // Resources
+        environment.jersey().register(new HomeResource("home"));
+        environment.jersey().register(new SolrResource(configuration));
+
+        final DBIFactory factory = new DBIFactory();
+        final DBI jdbi;
+        try {
+            jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
+            final ImageDAO imageDAO = jdbi.onDemand(ImageDAO.class);
+            final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
+            environment.jersey().register(new FileResource(configuration, imageDAO));
+            environment.jersey().register(new RegisterResource(userDAO));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

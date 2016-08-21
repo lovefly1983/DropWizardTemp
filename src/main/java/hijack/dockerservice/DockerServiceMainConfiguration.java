@@ -1,32 +1,65 @@
 package hijack.dockerservice;
 
+import hijack.dockerservice.factory.SolrFactory;
 import hijack.dockerservice.model.Template;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class DockerServiceMainConfiguration extends Configuration {
-    @NotEmpty
+    @NotNull
     private String template;
 
-    @NotEmpty
+    @NotNull
     private String defaultName = "Stranger";
 
-    @NotEmpty
+    @NotNull
     private String svnUser;
 
-    @NotEmpty
+    @NotNull
     private String svnPwd;
 
-    @NotEmpty
+    @NotNull
     private String svnUrl;
 
-    @NotEmpty
+    @NotNull
     private String dockerServerUrl;
+
+    @NotNull
+    private String imagesFolder;
+
+    @NotNull
+    private String imagesVirtualFolder;
+
+    @NotNull
+    private boolean asyncToSolr;
+
+    public boolean isAsyncToSolr() {
+        return asyncToSolr;
+    }
+
+    public void setAsyncToSolr(boolean asyncToSolr) {
+        this.asyncToSolr = asyncToSolr;
+    }
+
+    public String getImagesVirtualFolder() {
+        return imagesVirtualFolder;
+    }
+
+    public void setImagesVirtualFolder(String imagesVirtualFolder) {
+        this.imagesVirtualFolder = imagesVirtualFolder;
+    }
+
+    public String getImagesFolder() {
+        return imagesFolder;
+    }
+
+    public void setImagesFolder(String imagesFolder) {
+        this.imagesFolder = imagesFolder;
+    }
 
     public String getDockerServerUrl() {
         return dockerServerUrl;
@@ -101,4 +134,12 @@ public class DockerServiceMainConfiguration extends Configuration {
     public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
         this.database = dataSourceFactory;
     }
+
+    private SolrFactory solr = new SolrFactory();
+
+    @JsonProperty("solr")
+    public SolrFactory getSolrFactory() { return solr;}
+
+    @JsonProperty("solr")
+    public void setSolrFactory(SolrFactory solr) { this.solr = solr;}
 }
