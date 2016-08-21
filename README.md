@@ -8,6 +8,7 @@ Prerequisites:
 Steps to run:
 * mvn package
 * java -jar target/docker-service-1.0-SNAPSHOT.jar server example.yml
+* check RESTful api <br>
 
 TODO:
 * ~~Generate the image preview on the fly when uploading (or use a cron job, MQ to async process it)~~
